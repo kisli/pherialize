@@ -72,6 +72,11 @@ BOOST_AUTO_TEST_CASE(unserializeDouble) {
 
 	BOOST_CHECK(m->type() == Mixed::TYPE_DOUBLE);
 	BOOST_CHECK_CLOSE(m->doubleValue(), 44.83834308566653, 0.000001);
+
+	shared_ptr <Mixed> m2 = unserialize("d:-0.05;");
+
+	BOOST_CHECK(m2->type() == Mixed::TYPE_DOUBLE);
+	BOOST_CHECK_CLOSE(m2->doubleValue(), -0.05, 0.000001);
 }
 
 

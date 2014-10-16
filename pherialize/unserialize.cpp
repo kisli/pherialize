@@ -130,7 +130,7 @@ shared_ptr <Mixed> Unserializer::unserializeDouble() {
 	const char *numberEnd = numberStart;
 
 	while (numberEnd < m_data.data() + m_length &&
-	       (*numberEnd == '.' || *numberEnd >= '0' && *numberEnd <= '9')) {
+	       (*numberEnd == '.' || *numberEnd == '-' || *numberEnd >= '0' && *numberEnd <= '9')) {
 		++numberEnd;
 	}
 
