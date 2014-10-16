@@ -45,6 +45,7 @@ public:
 		TYPE_STRING,
 		TYPE_INT,
 		TYPE_BOOL,
+		TYPE_DOUBLE,
 		TYPE_ARRAY,
 	};
 
@@ -54,6 +55,7 @@ public:
 	Mixed(const char *v);
 	Mixed(const int v);
 	Mixed(const bool v);
+	Mixed(const double v);
 	Mixed(const MixedArray &v);
 
 	Mixed(const Mixed &v);
@@ -92,6 +94,13 @@ public:
 	  */
 	bool boolValue() const;
 
+	/** Returns the value as a double.
+	  *
+	  * @throw std::runtime_error if the stored value is not a double
+	  * @return double value
+	  */
+	double doubleValue() const;
+
 	/** Returns the value as a mixed array.
 	  *
 	  * @throw std::runtime_error if the stored value is not an array
@@ -110,6 +119,7 @@ private:
 		std::string *stringValue;
 		int intValue;
 		bool boolValue;
+		double doubleValue;
 		MixedArray *arrayValue;
 	};
 

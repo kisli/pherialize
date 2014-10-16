@@ -57,6 +57,13 @@ Mixed::Mixed(const bool v) {
 }
 
 
+Mixed::Mixed(const double v) {
+
+	m_type = TYPE_DOUBLE;
+	m_value.doubleValue = v;
+}
+
+
 Mixed::Mixed(const MixedArray &v) {
 
 	m_type = TYPE_ARRAY;
@@ -101,6 +108,11 @@ void Mixed::copyValue(const Mixed &v) {
 			m_value.boolValue = v.m_value.boolValue;
 			break;
 
+		case TYPE_DOUBLE:
+
+			m_value.doubleValue = v.m_value.doubleValue;
+			break;
+
 		case TYPE_NULL:
 
 			break;
@@ -124,6 +136,7 @@ void Mixed::deleteValue(const Type type, ValueType &value) {
 		case TYPE_NULL:
 		case TYPE_INT:
 		case TYPE_BOOL:
+		case TYPE_DOUBLE:
 
 			break;
 	}
@@ -168,6 +181,10 @@ bool Mixed::operator==(const Mixed &v) const {
 		case TYPE_BOOL:
 
 			return m_value.boolValue == v.m_value.boolValue;
+
+		case TYPE_DOUBLE:
+
+			return m_value.doubleValue == v.m_value.doubleValue;
 	}
 
 	return false;
@@ -206,6 +223,10 @@ bool Mixed::operator<(const Mixed &v) const {
 		case TYPE_BOOL:
 
 			return m_value.boolValue < v.m_value.boolValue;
+
+		case TYPE_DOUBLE:
+
+			return m_value.doubleValue < v.m_value.doubleValue;
 	}
 }
 
@@ -241,6 +262,14 @@ bool Mixed::boolValue() const {
 		throw std::runtime_error("Invalid value type for 'bool'.");
 	}
 	return m_value.boolValue;
+}
+
+
+double Mixed::doubleValue() const {
+	if (m_type != TYPE_DOUBLE) {
+		throw std::runtime_error("Invalid value type for 'double'.");
+	}
+	return m_value.doubleValue;
 }
 
 

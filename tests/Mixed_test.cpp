@@ -68,6 +68,12 @@ BOOST_AUTO_TEST_CASE(Mixed_constructors) {
 	Mixed m6(m5);
 	BOOST_CHECK(m6.type() == m5.type());
 	BOOST_CHECK(m6 == m5);
+
+	// Mixed(const double v)
+	const double d = true;
+	Mixed m7(d);
+	BOOST_CHECK(m7.type() == Mixed::TYPE_DOUBLE);
+	BOOST_CHECK(m7.doubleValue() == d);
 }
 
 
@@ -100,6 +106,11 @@ BOOST_AUTO_TEST_CASE(Mixed_operator_eq) {
 	const Mixed m3_1(marr1);
 	const Mixed m3_2(marr2);
 	BOOST_CHECK(m3_1 == m3_2);
+
+	// Double
+	Mixed m4_1(1.2345);
+	Mixed m4_2(1.2345);
+	BOOST_CHECK(m4_1 == m4_2);
 }
 
 
@@ -132,4 +143,9 @@ BOOST_AUTO_TEST_CASE(Mixed_operator_neq) {
 	const Mixed m3_1(marr1);
 	const Mixed m3_2(marr2);
 	BOOST_CHECK(m3_1 != m3_2);
+
+	// Double
+	Mixed m4_1(1.2345);
+	Mixed m4_2(42.42);
+	BOOST_CHECK(m4_1 != m4_2);
 }

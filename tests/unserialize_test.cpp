@@ -66,6 +66,15 @@ BOOST_AUTO_TEST_CASE(unserializeBool) {
 }
 
 
+BOOST_AUTO_TEST_CASE(unserializeDouble) {
+
+	shared_ptr <Mixed> m = unserialize("d:44.83834308566653;");
+
+	BOOST_CHECK(m->type() == Mixed::TYPE_DOUBLE);
+	BOOST_CHECK_CLOSE(m->doubleValue(), 44.83834308566653, 0.000001);
+}
+
+
 const Mixed &readMap(const std::map <Mixed, Mixed> &map, const Mixed &key) {
 	const std::map <Mixed, Mixed>::const_iterator it = map.find(key);
 	if (it == map.end()) {

@@ -20,6 +20,8 @@
 
 #include <stdexcept>
 #include <cstdlib>
+#include <istream>
+#include <sstream>
 
 #include <boost/format.hpp>
 
@@ -61,6 +63,11 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 
 			++m_pos;
 			return unserializeBool();
+
+		case 'd':
+
+			++m_pos;
+			return unserializeDouble();
 
 		case '\0':
 
@@ -110,6 +117,42 @@ shared_ptr <Mixed> Unserializer::unserializeBool() {
 		m_pos++;  // skip ';'
 
 	return make_shared <Mixed>(number ? true : false);
+}
+
+
+shared_ptr <Mixed> Unserializer::unserializeDouble() {
+
+	if (m_data[m_pos] != ':') {
+		throw std::runtime_error("Expected ':'.");
+	}
+
+	const char *numberStart = m_data.data() + m_pos + 1;
+	const char *numberEnd = numberStart;
+
+	while (numberEnd < m_data.data() + m_length &&
+	       (*numberEnd == '.' || *numberEnd >= '0' && *numberEnd <= '9')) {
+		++numberEnd;
+	}
+
+	const std::string numberStr(numberStart, numberEnd);
+	std::istringstream is(numberStr);
+
+	double number;
+
+	if (!(is >> number)) {
+		throw std::runtime_error(
+			(boost::format("Invalid format for double: '%1%'.") % numberStr).str()
+		);
+	}
+
+	m_pos = numberEnd - m_data.data();
+
+	if (m_data[m_pos] != ';')
+		throw std::runtime_error("Expected ';'.");
+	else
+		m_pos++;  // skip ';'
+
+	return make_shared <Mixed>(number);
 }
 
 

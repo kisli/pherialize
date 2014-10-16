@@ -57,6 +57,7 @@ private:
 
 	shared_ptr <Mixed> unserializeInt();
 	shared_ptr <Mixed> unserializeBool();
+	shared_ptr <Mixed> unserializeDouble();
 	shared_ptr <Mixed> unserializeString();
 	shared_ptr <Mixed> unserializeArray();
 
