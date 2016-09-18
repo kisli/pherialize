@@ -23,10 +23,11 @@
 #include <istream>
 #include <sstream>
 
+#include <iostream>
 #include <boost/format.hpp>
 
 
-
+using namespace std;
 namespace pherialize {
 
 
@@ -55,9 +56,17 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 			return unserializeInt();
 
 		case 'a':
-
 			++m_pos;
 			return unserializeArray();
+
+		case 'O':
+
+			++m_pos;
+			return unserializeObjectToArray();
+
+		case 'N':
+			++m_pos;
+			return unserializeNull();
 
 		case 'b':
 
@@ -70,7 +79,6 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 			return unserializeDouble();
 
 		case '\0':
-
 			return shared_ptr <Mixed>();
 	}
 
@@ -79,6 +87,19 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 	);
 }
 
+shared_ptr <Mixed> Unserializer::unserializeNull() {
+
+	char *charAfterNumber;
+	const std::size_t number = std::strtol(m_data.data() + m_pos, &charAfterNumber, /* base */ 10);
+	m_pos = charAfterNumber - m_data.data();
+
+	if (m_data[m_pos] != ';')
+		throw std::runtime_error("Expected ';'.");
+	else
+		m_pos++;  // skip ';'
+
+	return make_shared <Mixed>(false);
+}
 
 shared_ptr <Mixed> Unserializer::unserializeInt() {
 
@@ -109,6 +130,7 @@ shared_ptr <Mixed> Unserializer::unserializeBool() {
 	char *charAfterNumber;
 	const std::size_t number = std::strtol(m_data.data() + m_pos + 1, &charAfterNumber, /* base */ 10);
 
+	//cout << number << " " << charAfterNumber << endl;
 	m_pos = charAfterNumber - m_data.data();
 
 	if (m_data[m_pos] != ';')
@@ -185,6 +207,68 @@ shared_ptr <Mixed> Unserializer::unserializeString() {
 	return make_shared <Mixed>(std::string(charAfterLen + 1, charAfterLen + 1 + len));
 }
 
+// stdclass
+shared_ptr <Mixed> Unserializer::unserializeObjectToArray() {
+
+	if (m_data[m_pos] != ':') {
+		throw std::runtime_error("Expected ':'.");
+	}
+
+	char *charAfterCount;
+	const std::size_t count1 = std::strtol(m_data.data() + m_pos + 1, &charAfterCount, /* base */ 10);
+	const std::size_t count = std::strtol(m_data.data() + m_pos + 1 + count1 + 5, &charAfterCount, /* base */ 10);
+
+	if (*charAfterCount != ':') {
+		throw std::runtime_error("Expected ':'.");
+	}
+
+	++charAfterCount;  // skip ':'
+
+	if (*charAfterCount != '{') {
+		throw std::runtime_error("Expected '{'.");
+	}
+
+	++charAfterCount;  // skip '{'
+
+	m_pos = charAfterCount - m_data.data();
+
+	// Parse elements
+	std::map <Mixed, Mixed> map;
+	std::vector <Mixed> array;
+
+	bool allKeysAreInteger = true;
+	bool allKeysAreConsecutive = true;
+	int previousKey = -1;
+
+	while (m_data[m_pos] != '\0') {
+
+		if (m_data[m_pos] == '}') {
+			m_pos++;
+			break;
+		}
+
+		shared_ptr <Mixed> key = unserializeObject();
+
+		if (key->type() != Mixed::TYPE_INT) {
+			allKeysAreInteger = false;
+		} else if (key->intValue() != previousKey + 1) {
+			allKeysAreConsecutive = false;
+		} else {
+			previousKey++;
+		}
+
+		shared_ptr <Mixed> value = unserializeObject();
+
+		array.push_back(*value);
+		map.insert(std::map <Mixed, Mixed>::value_type(*key, *value));
+	}
+
+	if (allKeysAreInteger && allKeysAreConsecutive) {
+		return make_shared <Mixed>(array);
+	} else {
+		return make_shared <Mixed>(map);
+	}
+}
 
 shared_ptr <Mixed> Unserializer::unserializeArray() {
 
