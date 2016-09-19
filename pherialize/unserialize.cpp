@@ -27,7 +27,6 @@
 #include <boost/format.hpp>
 
 
-using namespace std;
 namespace pherialize {
 
 
@@ -56,6 +55,7 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 			return unserializeInt();
 
 		case 'a':
+
 			++m_pos;
 			return unserializeArray();
 
@@ -65,6 +65,7 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 			return unserializeObjectToArray();
 
 		case 'N':
+
 			++m_pos;
 			return unserializeNull();
 
@@ -79,6 +80,7 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 			return unserializeDouble();
 
 		case '\0':
+
 			return shared_ptr <Mixed>();
 	}
 
@@ -86,6 +88,7 @@ shared_ptr <Mixed> Unserializer::unserializeObject() {
 		(boost::format("Unable to unserialize unknown type '%1%'.") % type).str()
 	);
 }
+
 
 shared_ptr <Mixed> Unserializer::unserializeNull() {
 
@@ -100,6 +103,7 @@ shared_ptr <Mixed> Unserializer::unserializeNull() {
 
 	return make_shared <Mixed>(false);
 }
+
 
 shared_ptr <Mixed> Unserializer::unserializeInt() {
 
@@ -130,7 +134,6 @@ shared_ptr <Mixed> Unserializer::unserializeBool() {
 	char *charAfterNumber;
 	const std::size_t number = std::strtol(m_data.data() + m_pos + 1, &charAfterNumber, /* base */ 10);
 
-	//cout << number << " " << charAfterNumber << endl;
 	m_pos = charAfterNumber - m_data.data();
 
 	if (m_data[m_pos] != ';')
@@ -207,7 +210,7 @@ shared_ptr <Mixed> Unserializer::unserializeString() {
 	return make_shared <Mixed>(std::string(charAfterLen + 1, charAfterLen + 1 + len));
 }
 
-// stdclass
+
 shared_ptr <Mixed> Unserializer::unserializeObjectToArray() {
 
 	if (m_data[m_pos] != ':') {
@@ -269,6 +272,7 @@ shared_ptr <Mixed> Unserializer::unserializeObjectToArray() {
 		return make_shared <Mixed>(map);
 	}
 }
+
 
 shared_ptr <Mixed> Unserializer::unserializeArray() {
 
