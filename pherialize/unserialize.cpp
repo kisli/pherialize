@@ -207,7 +207,7 @@ shared_ptr <Mixed> Unserializer::unserializeString() {
 	else
 		m_pos++;  // skip ';'
 
-	return make_shared <Mixed>(std::string(charAfterLen + 1, charAfterLen + 1 + len));
+	return shared_ptr <Mixed>(new Mixed(std::string(charAfterLen + 1, charAfterLen + 1 + len)));
 }
 
 
@@ -267,9 +267,9 @@ shared_ptr <Mixed> Unserializer::unserializeObjectToArray() {
 	}
 
 	if (allKeysAreInteger && allKeysAreConsecutive) {
-		return make_shared <Mixed>(array);
+		return shared_ptr <Mixed>(new Mixed(MixedArray(array)));
 	} else {
-		return make_shared <Mixed>(map);
+		return shared_ptr <Mixed>(new Mixed(MixedArray(map)));
 	}
 }
 
@@ -329,9 +329,9 @@ shared_ptr <Mixed> Unserializer::unserializeArray() {
 	}
 
 	if (allKeysAreInteger && allKeysAreConsecutive) {
-		return make_shared <Mixed>(array);
+		return shared_ptr <Mixed>(new Mixed(MixedArray(array)));
 	} else {
-		return make_shared <Mixed>(map);
+		return shared_ptr <Mixed>(new Mixed(MixedArray(map)));
 	}
 }
 
